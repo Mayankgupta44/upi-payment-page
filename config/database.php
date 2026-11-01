@@ -62,6 +62,26 @@ return [
             ]) : [],
         ],
 
+        'tidb' => [
+            'driver' => 'mysql',
+            'url' => null,
+            'host' => env('TIDB_HOST'),
+            'port' => env('TIDB_PORT', '4000'),
+            'database' => env('TIDB_DATABASE', 'upi_payment_db'),
+            'username' => env('TIDB_USERNAME'),
+            'password' => env('TIDB_PASSWORD'),
+            'unix_socket' => '',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => [
+                PDO::MYSQL_ATTR_SSL_CA => env('TIDB_SSL_CA'),
+            ],
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),
