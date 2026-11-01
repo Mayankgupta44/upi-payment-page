@@ -2,7 +2,7 @@ FROM php:8.2-apache AS app
 
 # Install PHP extensions required by Laravel
 RUN apt-get update && apt-get install -y \
-    unzip git libzip-dev libicu-dev \
+    unzip git libzip-dev libicu-dev libonig-dev \
     libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo_mysql mbstring bcmath exif gd zip intl opcache \
