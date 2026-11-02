@@ -41,6 +41,7 @@ RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' \
     /etc/apache2/sites-available/000-default.conf \
     && sed -i 's|AllowOverride None|AllowOverride All|' \
     /etc/apache2/apache2.conf \
+    && mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
