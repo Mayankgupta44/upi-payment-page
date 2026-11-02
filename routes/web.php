@@ -11,7 +11,14 @@ Route::get('/', [PaymentController::class, 'create'])
 Route::get('/session-check', function (\Illuminate\Http\Request $request) {
     $request->session()->put('session_check', 'working');
 
-    return response('Laravel session is running.');
+    return response()->json([
+        'session_driver' => config('session.driver'),
+        'session_cookie' => config('session.cookie'),
+        'session_id_exists' => $request->session()->getId() !== '',
+        'session_directory_exists' => is_dir(storage_path('framework/sessions')),
+        'session_directory_writable' => is_writable(storage_path('framework/sessions')),
+        'middleware' => $request->route()->gatherMiddleware(),
+    ]);
 });
 
 Route::post('/payment', [PaymentController::class, 'store'])
