@@ -8,6 +8,12 @@ use App\Http\Controllers\PaymentController;
 Route::get('/', [PaymentController::class, 'create'])
     ->name('payment.create');
 
+Route::get('/session-check', function (\Illuminate\Http\Request $request) {
+    $request->session()->put('session_check', 'working');
+
+    return response('Laravel session is running.');
+});
+
 Route::post('/payment', [PaymentController::class, 'store'])
     ->name('payment.store');
 
