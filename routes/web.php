@@ -8,17 +8,15 @@ use App\Http\Controllers\PaymentController;
 Route::get('/', [PaymentController::class, 'create'])
     ->name('payment.create');
 
-Route::get('/session-check', function (\Illuminate\Http\Request $request) {
-    $request->session()->put('session_check', 'working');
+Route::get('/session-check', function () {
+    header(
+        'Set-Cookie: cookie_probe=test123; Path=/; Secure; SameSite=Lax',
+        false
+    );
 
     return response()->json([
-        'session_driver' => config('session.driver'),
-        'session_cookie' => config('session.cookie'),
-        'session_secure' => config('session.secure'),
-        'session_domain' => config('session.domain'),
-        'session_path' => config('session.path'),
-        'session_same_site' => config('session.same_site'),
-    ])->withCookie(cookie('cookie_probe', 'test123', 5));
+        'test' => 'cookie header test',
+    ])->header('X-Cookie-Debug', 'route-reached');
 });
 
 Route::post('/payment', [PaymentController::class, 'store'])
