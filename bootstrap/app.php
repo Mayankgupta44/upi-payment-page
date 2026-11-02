@@ -12,12 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
 
-        // Trust Render's proxy headers so Laravel detects HTTPS correctly.
         $middleware->trustProxies(at: '*');
 
-        // Keep CSRF protection enabled, except for the Razorpay webhook.
         $middleware->validateCsrfTokens(except: [
             'webhooks/razorpay',
+            'payment',
+            'payment/verify',
         ]);
 
     })
