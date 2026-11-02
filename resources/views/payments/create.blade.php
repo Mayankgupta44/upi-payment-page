@@ -215,61 +215,81 @@
 </div>
 
 @if (isset($razorpayOrder))
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"
+            onerror="alert('Razorpay Checkout could not load. Please check your internet connection.')">
+    </script>
 
     <script>
-        const options = {
-            key: @json($razorpayOrder['key']),
-            amount: @json($razorpayOrder['amount']),
-            currency: 'INR',
-            name: 'UPI Payment',
-            description: 'Customer payment',
-            order_id: @json($razorpayOrder['order_id']),
+        document.addEventListener('DOMContentLoaded', function () {
 
-            prefill: {
-                name: @json($razorpayOrder['customer_name']),
-                email: @json($razorpayOrder['email']),
-                contact: @json($razorpayOrder['mobile'])
-            },
-
-            theme: {
-                color: '#2563eb'
-            },
-
-            handler: async function (response) {
-                try {
-                    const result = await fetch(@json(route('payment.verify')), {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': @json(csrf_token())
-                        },
-                        body: JSON.stringify(response)
-                    });
-
-                    const data = await result.json();
-
-                    if (result.ok) {
-                        alert(data.message);
-                        window.location.href = data.redirect;
-                    } else {
-                        alert(data.message || 'Payment could not be verified. Please contact the administrator.');
-                    }
-                } catch (error) {
-                    alert('Could not contact the server to verify payment. Please contact the administrator before trying to pay again.');
-                }
-            },
-
-            modal: {
-                ondismiss: function () {
-                    alert('Checkout closed. Your payment is still pending until its status is confirmed.');
-                }
+            if (typeof Razorpay === 'undefined') {
+                alert('Razorpay Checkout library failed to load.');
+                return;
             }
-        };
 
-        const razorpayCheckout = new Razorpay(options);
-        razorpayCheckout.open();
+            const options = {
+                key: @json($razorpayOrder['key']),
+                amount: @json($razorpayOrder['amount']),
+                currency: 'INR',
+                name: 'UPI Payment Portal',
+                description: 'Customer payment',
+                order_id: @json($razorpayOrder['order_id']),
+
+                prefill: {
+                    name: @json($razorpayOrder['customer_name']),
+                    email: @json($razorpayOrder['email']),
+                    contact: @json($razorpayOrder['mobile'])
+                },
+
+                theme: {
+                    color: '#2457d6'
+                },
+
+                handler: async function (response) {
+                    try {
+                        const result = await fetch(
+                            @json(route('payment.verify')),
+                            {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': @json(csrf_token())
+                                },
+                                body: JSON.stringify(response)
+                            }
+                        );
+
+                        const data = await result.json();
+
+                        if (result.ok) {
+                            alert('Payment successful and verified!');
+                            window.location.href = data.redirect;
+                        } else {
+                            alert(data.message || 'Payment verification failed.');
+                        }
+
+                    } catch (error) {
+                        console.error('Verification error:', error);
+                        alert('Unable to verify payment. Please contact the administrator.');
+                    }
+                },
+
+                modal: {
+                    ondismiss: function () {
+                        console.log('Razorpay checkout closed.');
+                    }
+                }
+            };
+
+            try {
+                const checkout = new Razorpay(options);
+                checkout.open();
+            } catch (error) {
+                console.error('Razorpay initialization error:', error);
+                alert('Unable to open Razorpay Checkout: ' + error.message);
+            }
+        });
     </script>
 @endif
 </body>

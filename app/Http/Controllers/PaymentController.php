@@ -100,10 +100,16 @@ class PaymentController extends Controller
                 ]);
             });
 
-            $api = new Api(
-                config('services.razorpay.key'),
-                config('services.razorpay.secret')
-            );
+            $key = config('services.razorpay.key');
+            $secret = config('services.razorpay.secret');
+
+            if (empty($key) || empty($secret)) {
+                throw new \RuntimeException(
+                    'Razorpay API keys are missing from server configuration.'
+                );
+            }
+
+            $api = new Api($key, $secret);
 
             $order = $api->order->create([
                 'receipt' => 'payment_' . $payment->id,
@@ -117,7 +123,7 @@ class PaymentController extends Controller
 
             return view('payments.create', [
                 'razorpayOrder' => [
-                    'key' => config('services.razorpay.key'),
+                    'key' => $key,
                     'order_id' => $order['id'],
                     'amount' => (int) round($payment->amount * 100),
                     'customer_name' => $validated['full_name'],
